@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from config import FEATURES, FLOAT_FEATURES, LABEL_COL, ATTACK_COL, DATASETS
+from config import FEATURES, FLOAT_FEATURES, LABEL_COL, ATTACK_COL, DATASETS, L7_PROTO_MAP, L7_PROTO_UNKNOWN
 
 _UINT16_MAX = np.iinfo(np.uint16).max  # 65535
 
@@ -23,8 +23,9 @@ def to_uint16_saturated(df: pd.DataFrame) -> pd.DataFrame:
         A new DataFrame where every feature column has dtype uint16.
     """
     df = df.copy()
-    df[FEATURES] = (
-        df[FEATURES]
+    feature_cols = [c for c in FEATURES if c in df.columns]
+    df[feature_cols] = (
+        df[feature_cols]
         .clip(lower=0, upper=_UINT16_MAX)
         .astype(np.uint16)
     )
@@ -62,19 +63,12 @@ def load_dataset(path: str, integer_only: bool = False) -> pd.DataFrame:
 
     if integer_only:
         df = df.drop(columns=FLOAT_FEATURES)
+        # Map L7_PROTO float values to categorical uint16 IDs before saturation.
+        # Unknown values (not in the map) are assigned L7_PROTO_UNKNOWN.
+        df["L7_PROTO"] = (
+            df["L7_PROTO"].map(L7_PROTO_MAP).fillna(L7_PROTO_UNKNOWN).astype(np.uint16)
+        )
         df = to_uint16_saturated(df)
 
     return df
 
-
-def print_l7_proto_values() -> None:
-    """Print the unique L7_PROTO values across all datasets.
-
-    Only L7_PROTO is read from each file for efficiency.
-    """
-    unique_vals = set()
-    for path in DATASETS:
-        df = pd.read_csv(path, usecols=["L7_PROTO"])
-        unique_vals.update(df["L7_PROTO"].dropna().unique())
-
-    print(f"Unique L7_PROTO values across all datasets ({len(unique_vals)}): {sorted(unique_vals)}")
