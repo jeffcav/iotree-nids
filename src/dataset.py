@@ -1,5 +1,8 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 from config import FEATURES, FLOAT_FEATURES, LABEL_COL, ATTACK_COL, DATASETS, L7_PROTO_MAP, L7_PROTO_UNKNOWN
 
@@ -72,3 +75,71 @@ def load_dataset(path: str, integer_only: bool = False) -> pd.DataFrame:
 
     return df
 
+
+def split_datasets(
+    repo_root: Path | str | None = None,
+    train_size: float = 0.70,
+    random_state: int = 42,
+) -> None:
+    """Split every dataset in config.DATASETS into train/test CSVs (70/30).
+
+    For each dataset two variants are produced:
+      - **float**   – all original feature dtypes preserved (``integer_only=False``)
+      - **uint16**  – float features dropped, remaining columns cast to uint16
+                      (``integer_only=True``)
+
+    Output files are written to the ``dataset/`` directory alongside the
+    source CSVs, using the naming convention::
+
+        <stem>_float_train.csv  /  <stem>_float_test.csv
+        <stem>_uint16_train.csv /  <stem>_uint16_test.csv
+
+    The split is stratified on :data:`~config.LABEL_COL` so that the
+    class-ratio is preserved in both partitions.
+
+    Parameters
+    ----------
+    repo_root:
+        Path to the repository root (the directory that contains the
+        ``dataset/`` folder).  Defaults to the parent of this file's parent,
+        i.e. the standard layout where ``src/dataset.py`` lives one level
+        below the repo root.
+    train_size:
+        Fraction of rows to place in the training split.  Default is ``0.70``.
+    random_state:
+        Seed for the random splitter.  Default is ``42``.
+    """
+    if repo_root is None:
+        repo_root = Path(__file__).resolve().parent.parent
+    repo_root = Path(repo_root)
+
+    for dataset_path in DATASETS:
+        abs_path = repo_root / dataset_path
+        stem = abs_path.stem  # e.g. "NF-BoT-IoT-v2"
+        out_dir = abs_path.parent
+        print(f"Splitting {stem} ...")
+
+        for dtype_label, integer_only in (("float", False), ("uint16", True)):
+            df = load_dataset(str(abs_path), integer_only=integer_only)
+
+            train_df, test_df = train_test_split(
+                df,
+                train_size=train_size,
+                random_state=random_state,
+                stratify=df[LABEL_COL],
+            )
+
+            train_path = out_dir / f"{stem}_{dtype_label}_train.csv"
+            test_path = out_dir / f"{stem}_{dtype_label}_test.csv"
+
+            train_df.to_csv(train_path, index=False)
+            test_df.to_csv(test_path, index=False)
+
+            print(
+                f"  [{dtype_label}] train={len(train_df):,}  test={len(test_df):,}"
+                f"  -> {train_path.name} / {test_path.name}"
+            )
+
+
+if __name__ == "__main__":
+    split_datasets()
