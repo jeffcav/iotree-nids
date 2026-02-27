@@ -7,6 +7,13 @@ from sklearn.model_selection import train_test_split
 from config import FEATURES, FLOAT_FEATURES, LABEL_COL, ATTACK_COL, DATASETS, L7_PROTO_MAP, L7_PROTO_UNKNOWN
 
 _UINT16_MAX = np.iinfo(np.uint16).max  # 65535
+_FLOAT32_MAX = np.finfo(np.float32).max  # ~3.4e+38
+
+# Float-only throughput columns that can contain astronomically large values
+# in some datasets (e.g. NF-CSE-CIC-IDS2018-v2) and must be capped before
+# writing train/test splits so that float32-based models do not receive
+# values that overflow to infinity.
+_THROUGHPUT_COLS = ("SRC_TO_DST_SECOND_BYTES", "DST_TO_SRC_SECOND_BYTES")
 
 
 def to_uint16_saturated(df: pd.DataFrame) -> pd.DataFrame:
@@ -59,13 +66,14 @@ def load_dataset(path: str, integer_only: bool = False) -> pd.DataFrame:
     pd.DataFrame
         DataFrame with columns = FEATURES + [LABEL_COL, ATTACK_COL].
     """
-    usecols = FEATURES + [LABEL_COL, ATTACK_COL]
+    feature_cols = [f for f in FEATURES if not (integer_only and f in FLOAT_FEATURES)]
+    usecols = feature_cols + [LABEL_COL, ATTACK_COL]
     df = pd.read_csv(path, usecols=usecols)
     # Enforce feature column order: features first, then labels
     df = df[usecols]
 
     if integer_only:
-        df = df.drop(columns=FLOAT_FEATURES)
+        df = df.drop(columns=FLOAT_FEATURES, errors="ignore")
         # Map L7_PROTO float values to categorical uint16 IDs before saturation.
         # Unknown values (not in the map) are assigned L7_PROTO_UNKNOWN.
         df["L7_PROTO"] = (
@@ -121,6 +129,14 @@ def split_datasets(
 
         for dtype_label, integer_only in (("float", False), ("uint16", True)):
             df = load_dataset(str(abs_path), integer_only=integer_only)
+
+            # Cap throughput columns to the float32 range so that splits
+            # never contain values that overflow to infinity when a model
+            # casts the feature matrix to float32 internally.
+            if not integer_only:
+                for col in _THROUGHPUT_COLS:
+                    if col in df.columns:
+                        df[col] = df[col].clip(lower=0, upper=_FLOAT32_MAX)
 
             train_df, test_df = train_test_split(
                 df,
