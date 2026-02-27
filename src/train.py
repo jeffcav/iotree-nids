@@ -1,7 +1,7 @@
-"""Train random forest models for every combination of:
+"""Train random forest and LightGBM models for every combination of:
   - dataset   (from config.DATASETS)
   - feature mode  (float  /  integer-only)
-  - max_leaf_nodes  (from config.MAX_LEAVES)
+  - max_leaf_nodes / num_leaves  (from config.MAX_LEAVES)
 
 Saved layout
 ------------
@@ -9,10 +9,12 @@ models/
   <dataset_stem>/
     float/
       <max_leaves>/
-        model.joblib
+        rf.joblib
+        lgbm.joblib
     integer/
       <max_leaves>/
-        model.joblib
+        rf.joblib
+        lgbm.joblib
 """
 
 import os
@@ -20,8 +22,9 @@ import sys
 from pathlib import Path
 
 import joblib
+import lightgbm as lgb
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 
 # Allow running directly from the src/ directory.
@@ -73,26 +76,40 @@ def train() -> None:
             for max_leaves in MAX_LEAVES:
                 out_dir = MODELS_DIR / dataset_name / mode / str(max_leaves)
                 out_dir.mkdir(parents=True, exist_ok=True)
-                model_path = out_dir / "model.joblib"
 
+                # ── Random Forest ──────────────────────────────────────────
+                rf_path = out_dir / "rf.joblib"
                 print(
-                    f"  [mode={mode}] Training RF  max_leaf_nodes={max_leaves:<5} … ",
+                    f"  [mode={mode}] Training RF   max_leaf_nodes={max_leaves:<5} … ",
                     end="",
                     flush=True,
                 )
-
-                clf = RandomForestClassifier(
+                clf_rf = RandomForestClassifier(
                     max_leaf_nodes=max_leaves,
                     n_jobs=-1,
                     random_state=42,
                 )
-                clf.fit(X_train, y_train)
+                clf_rf.fit(X_train, y_train)
+                f1_rf = f1_score(y_test, clf_rf.predict(X_test), average="weighted")
+                joblib.dump(clf_rf, rf_path)
+                print(f"f1={f1_rf:.4f}  →  {rf_path.relative_to(REPO_ROOT)}")
 
-                acc = accuracy_score(y_test, clf.predict(X_test))
-                joblib.dump(clf, model_path)
-
-                rel = model_path.relative_to(REPO_ROOT)
-                print(f"acc={acc:.4f}  →  {rel}")
+                # ── LightGBM ───────────────────────────────────────────────
+                lgbm_path = out_dir / "lgbm.joblib"
+                print(
+                    f"  [mode={mode}] Training LGBM num_leaves={max_leaves:<5}      … ",
+                    end="",
+                    flush=True,
+                )
+                clf_lgbm = lgb.LGBMClassifier(
+                    num_leaves=max_leaves,
+                    n_jobs=-1,
+                    random_state=42,
+                )
+                clf_lgbm.fit(X_train, y_train)
+                f1_lgbm = f1_score(y_test, clf_lgbm.predict(X_test), average="weighted")
+                joblib.dump(clf_lgbm, lgbm_path)
+                print(f"f1={f1_lgbm:.4f}  →  {lgbm_path.relative_to(REPO_ROOT)}")
 
 
 if __name__ == "__main__":
