@@ -138,7 +138,11 @@ def split_datasets(
             print(
                 f"  [{dtype_label}] train={len(train_df):,}  test={len(test_df):,}"
                 f"  -> {train_path.name} / {test_path.name}"
-            )
+            ) 
+
+            del df
+            del train_df
+            del test_df
 
 
 if __name__ == "__main__":
