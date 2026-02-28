@@ -125,7 +125,7 @@ def train() -> None:
             # avoids the serialisation cost of a process-based backend.
             # Both scikit-learn and LightGBM release the GIL during fitting,
             # so true parallel speedup is achieved.
-            Parallel(n_jobs=8 if dataset_idx>0 else 5, prefer="threads")(
+            Parallel(n_jobs=8, prefer="threads")(
                 delayed(_train_one)(
                     X_train,
                     y_train,

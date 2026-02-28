@@ -531,6 +531,10 @@ def export_top_features_md(
 
 if __name__ == "__main__":
     import argparse
+    import warnings
+
+    warnings.simplefilter(action='ignore', category=RuntimeWarning)
+    warnings.filterwarnings("ignore", category=UserWarning)
 
     parser = argparse.ArgumentParser(
         description="Compute PD-based feature importance (Greenwell et al., 2018) "
@@ -576,9 +580,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--n-rounds",
         type=int,
-        default=5,
+        default=33,
         metavar="R",
-        help="Stratified subsampling rounds to average per model (default: 5).",
+        help="Stratified subsampling rounds to average per model (default: 33).",
     )
     parser.add_argument(
         "--top-n",
