@@ -8,7 +8,7 @@ Importance measure: **standard deviation of the partial dependence function** (G
 |:----------|:------|
 | Modes | float, integer |
 | Models aggregated | 168 |
-| Top-N | 8 |
+| Top-N | 16 |
 
 ## Overall Ranking
 
@@ -24,6 +24,14 @@ Importance measure: **standard deviation of the partial dependence function** (G
 | 6 | `L4_SRC_PORT` | 0.046133 |
 | 7 | `DST_TO_SRC_AVG_THROUGHPUT` | 0.045053 |
 | 8 | `DST_TO_SRC_SECOND_BYTES` | 0.043114 |
+| 9 | `MAX_TTL` | 0.041473 |
+| 10 | `IN_BYTES` | 0.039058 |
+| 11 | `MIN_IP_PKT_LEN` | 0.037694 |
+| 12 | `SHORTEST_FLOW_PKT` | 0.037129 |
+| 13 | `LONGEST_FLOW_PKT` | 0.036976 |
+| 14 | `DNS_TTL_ANSWER` | 0.035036 |
+| 15 | `FLOW_DURATION_MILLISECONDS` | 0.034028 |
+| 16 | `CLIENT_TCP_FLAGS` | 0.028252 |
 
 ### Mode: integer
 
@@ -37,6 +45,14 @@ Importance measure: **standard deviation of the partial dependence function** (G
 | 6 | `L4_SRC_PORT` | 0.046097 |
 | 7 | `MAX_TTL` | 0.041235 |
 | 8 | `DNS_QUERY_TYPE` | 0.039628 |
+| 9 | `SRC_TO_DST_SECOND_BYTES` | 0.038684 |
+| 10 | `OUT_BYTES` | 0.035214 |
+| 11 | `FLOW_DURATION_MILLISECONDS` | 0.034584 |
+| 12 | `DST_TO_SRC_SECOND_BYTES` | 0.033988 |
+| 13 | `IN_BYTES` | 0.030084 |
+| 14 | `DNS_QUERY_ID` | 0.027772 |
+| 15 | `DNS_TTL_ANSWER` | 0.026791 |
+| 16 | `NUM_PKTS_256_TO_512_BYTES` | 0.026423 |
 
 ## Per-Dataset Top Features
 
@@ -54,6 +70,14 @@ Each column shows the top features ranked by mean PD-based importance within tha
 | 6 | `SRC_TO_DST_SECOND_BYTES` (0.0975) | `DURATION_IN` (0.0433) | `DNS_QUERY_TYPE` (0.0707) | `FLOW_DURATION_MILLISECONDS` (0.0201) |
 | 7 | `SHORTEST_FLOW_PKT` (0.0895) | `L7_PROTO` (0.0374) | `L4_SRC_PORT` (0.0632) | `DST_TO_SRC_SECOND_BYTES` (0.0163) |
 | 8 | `DNS_QUERY_ID` (0.0875) | `TCP_WIN_MAX_IN` (0.0360) | `NUM_PKTS_UP_TO_128_BYTES` (0.0616) | `SERVER_TCP_FLAGS` (0.0155) |
+| 9 | `OUT_BYTES` (0.0826) | `MIN_TTL` (0.0192) | `DST_TO_SRC_AVG_THROUGHPUT` (0.0603) | `L4_DST_PORT` (0.0141) |
+| 10 | `L7_PROTO` (0.0725) | `IN_BYTES` (0.0170) | `SHORTEST_FLOW_PKT` (0.0557) | `L7_PROTO` (0.0113) |
+| 11 | `RETRANSMITTED_OUT_BYTES` (0.0697) | `SERVER_TCP_FLAGS` (0.0159) | `IN_PKTS` (0.0556) | `L4_SRC_PORT` (0.0087) |
+| 12 | `L4_DST_PORT` (0.0573) | `TCP_FLAGS` (0.0147) | `TCP_WIN_MAX_OUT` (0.0544) | `PROTOCOL` (0.0073) |
+| 13 | `L4_SRC_PORT` (0.0572) | `NUM_PKTS_UP_TO_128_BYTES` (0.0103) | `CLIENT_TCP_FLAGS` (0.0542) | `DURATION_IN` (0.0060) |
+| 14 | `DURATION_OUT` (0.0569) | `NUM_PKTS_512_TO_1024_BYTES` (0.0089) | `MAX_TTL` (0.0469) | `DURATION_OUT` (0.0047) |
+| 15 | `NUM_PKTS_512_TO_1024_BYTES` (0.0543) | `ICMP_TYPE` (0.0066) | `TCP_FLAGS` (0.0444) | `DST_TO_SRC_AVG_THROUGHPUT` (0.0041) |
+| 16 | `CLIENT_TCP_FLAGS` (0.0534) | `MIN_IP_PKT_LEN` (0.0064) | `DST_TO_SRC_SECOND_BYTES` (0.0375) | `IN_BYTES` (0.0035) |
 
 ### Mode: integer
 
@@ -67,3 +91,11 @@ Each column shows the top features ranked by mean PD-based importance within tha
 | 6 | `IN_BYTES` (0.1022) | `LONGEST_FLOW_PKT` (0.0345) | `LONGEST_FLOW_PKT` (0.0682) | `FLOW_DURATION_MILLISECONDS` (0.0209) |
 | 7 | `RETRANSMITTED_OUT_BYTES` (0.0913) | `MIN_TTL` (0.0313) | `L4_SRC_PORT` (0.0610) | `L4_DST_PORT` (0.0136) |
 | 8 | `OUT_BYTES` (0.0910) | `TCP_FLAGS` (0.0185) | `TCP_WIN_MAX_OUT` (0.0565) | `SERVER_TCP_FLAGS` (0.0134) |
+| 9 | `L4_DST_PORT` (0.0894) | `TCP_WIN_MAX_IN` (0.0185) | `MAX_TTL` (0.0544) | `L7_PROTO` (0.0109) |
+| 10 | `NUM_PKTS_512_TO_1024_BYTES` (0.0824) | `SERVER_TCP_FLAGS` (0.0140) | `SHORTEST_FLOW_PKT` (0.0527) | `L4_SRC_PORT` (0.0089) |
+| 11 | `DURATION_OUT` (0.0678) | `IN_BYTES` (0.0110) | `CLIENT_TCP_FLAGS` (0.0524) | `PROTOCOL` (0.0089) |
+| 12 | `L4_SRC_PORT` (0.0630) | `NUM_PKTS_UP_TO_128_BYTES` (0.0085) | `NUM_PKTS_UP_TO_128_BYTES` (0.0524) | `DST_TO_SRC_SECOND_BYTES` (0.0057) |
+| 13 | `SRC_TO_DST_SECOND_BYTES` (0.0551) | `OUT_PKTS` (0.0073) | `OUT_BYTES` (0.0454) | `SHORTEST_FLOW_PKT` (0.0050) |
+| 14 | `DNS_QUERY_TYPE` (0.0465) | `IN_PKTS` (0.0061) | `OUT_PKTS` (0.0429) | `DURATION_IN` (0.0048) |
+| 15 | `FLOW_DURATION_MILLISECONDS` (0.0377) | `TCP_WIN_MAX_OUT` (0.0054) | `TCP_FLAGS` (0.0426) | `SRC_TO_DST_AVG_THROUGHPUT` (0.0043) |
+| 16 | `SHORTEST_FLOW_PKT` (0.0359) | `NUM_PKTS_128_TO_256_BYTES` (0.0048) | `L7_PROTO` (0.0390) | `IN_PKTS` (0.0038) |

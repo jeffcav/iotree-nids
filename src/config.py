@@ -437,7 +437,7 @@ MAX_LEAVES = [
 
 N_ESTIMATORS = [5, 9, 13]
 
-# Top-8 features per dataset and feature mode, ranked by PD-based importance
+# Top-16 features per dataset and feature mode, ranked by PD-based importance
 # (Greenwell, Boehmke & McCarthy 2018).  Derived from reports/pd_importance.md.
 # Used to train / evaluate models with only the selected features per dataset.
 SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
@@ -451,6 +451,14 @@ SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
             "SRC_TO_DST_SECOND_BYTES",
             "SHORTEST_FLOW_PKT",
             "DNS_QUERY_ID",
+            "OUT_BYTES",
+            "L7_PROTO",
+            "RETRANSMITTED_OUT_BYTES",
+            "L4_DST_PORT",
+            "L4_SRC_PORT",
+            "DURATION_OUT",
+            "NUM_PKTS_512_TO_1024_BYTES",
+            "CLIENT_TCP_FLAGS",
         ],
         "integer": [
             "MIN_IP_PKT_LEN",
@@ -461,6 +469,14 @@ SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
             "IN_BYTES",
             "RETRANSMITTED_OUT_BYTES",
             "OUT_BYTES",
+            "L4_DST_PORT",
+            "NUM_PKTS_512_TO_1024_BYTES",
+            "DURATION_OUT",
+            "L4_SRC_PORT",
+            "SRC_TO_DST_SECOND_BYTES",
+            "DNS_QUERY_TYPE",
+            "FLOW_DURATION_MILLISECONDS",
+            "SHORTEST_FLOW_PKT",
         ],
     },
     "NF-CSE-CIC-IDS2018-v2": {
@@ -473,6 +489,14 @@ SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
             "DURATION_IN",
             "L7_PROTO",
             "TCP_WIN_MAX_IN",
+            "MIN_TTL",
+            "IN_BYTES",
+            "SERVER_TCP_FLAGS",
+            "TCP_FLAGS",
+            "NUM_PKTS_UP_TO_128_BYTES",
+            "NUM_PKTS_512_TO_1024_BYTES",
+            "ICMP_TYPE",
+            "MIN_IP_PKT_LEN",
         ],
         "integer": [
             "L4_DST_PORT",
@@ -483,6 +507,14 @@ SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
             "LONGEST_FLOW_PKT",
             "MIN_TTL",
             "TCP_FLAGS",
+            "TCP_WIN_MAX_IN",
+            "SERVER_TCP_FLAGS",
+            "IN_BYTES",
+            "NUM_PKTS_UP_TO_128_BYTES",
+            "OUT_PKTS",
+            "IN_PKTS",
+            "TCP_WIN_MAX_OUT",
+            "NUM_PKTS_128_TO_256_BYTES",
         ],
     },
     "NF-ToN-IoT-v2": {
@@ -495,6 +527,14 @@ SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
             "DNS_QUERY_TYPE",
             "L4_SRC_PORT",
             "NUM_PKTS_UP_TO_128_BYTES",
+            "DST_TO_SRC_AVG_THROUGHPUT",
+            "SHORTEST_FLOW_PKT",
+            "IN_PKTS",
+            "TCP_WIN_MAX_OUT",
+            "CLIENT_TCP_FLAGS",
+            "MAX_TTL",
+            "TCP_FLAGS",
+            "DST_TO_SRC_SECOND_BYTES",
         ],
         "integer": [
             "DNS_QUERY_TYPE",
@@ -505,6 +545,14 @@ SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
             "LONGEST_FLOW_PKT",
             "L4_SRC_PORT",
             "TCP_WIN_MAX_OUT",
+            "MAX_TTL",
+            "SHORTEST_FLOW_PKT",
+            "CLIENT_TCP_FLAGS",
+            "NUM_PKTS_UP_TO_128_BYTES",
+            "OUT_BYTES",
+            "OUT_PKTS",
+            "TCP_FLAGS",
+            "L7_PROTO",
         ],
     },
     "NF-UNSW-NB15-v2": {
@@ -517,6 +565,14 @@ SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
             "FLOW_DURATION_MILLISECONDS",
             "DST_TO_SRC_SECOND_BYTES",
             "SERVER_TCP_FLAGS",
+            "L4_DST_PORT",
+            "L7_PROTO",
+            "L4_SRC_PORT",
+            "PROTOCOL",
+            "DURATION_IN",
+            "DURATION_OUT",
+            "DST_TO_SRC_AVG_THROUGHPUT",
+            "IN_BYTES",
         ],
         "integer": [
             "MIN_TTL",
@@ -527,6 +583,14 @@ SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
             "FLOW_DURATION_MILLISECONDS",
             "L4_DST_PORT",
             "SERVER_TCP_FLAGS",
+            "L7_PROTO",
+            "L4_SRC_PORT",
+            "PROTOCOL",
+            "DST_TO_SRC_SECOND_BYTES",
+            "SHORTEST_FLOW_PKT",
+            "DURATION_IN",
+            "SRC_TO_DST_AVG_THROUGHPUT",
+            "IN_PKTS",
         ],
     },
 }

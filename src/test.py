@@ -3,6 +3,7 @@
 For every combination of:
   - dataset        (from config.DATASETS)
   - feature mode   (float / integer)
+  - feature set    (full / selected)
   - num_leaves     (from config.MAX_LEAVES)
   - n_estimators   (from config.N_ESTIMATORS)
 
@@ -11,8 +12,10 @@ partition and records weighted precision, recall and F1-score.
 
 Output files
 ------------
-reports/metrics.csv   – one row per (dataset, mode, num_leaves, n_estimators)
-reports/metrics.md    – Markdown tables comparing all models per dataset
+reports/metrics_full.csv        – results for full-feature models
+reports/metrics_full.md         – Markdown report for full-feature models
+reports/metrics_selected.csv    – results for selected-feature models
+reports/metrics_selected.md     – Markdown report for selected-feature models
 """
 
 import os
@@ -28,7 +31,7 @@ from sklearn.metrics import f1_score, precision_score, recall_score
 # Allow running directly from src/.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from config import ATTACK_COL, DATASETS, FEATURES, LABEL_COL, MAX_LEAVES, N_ESTIMATORS
+from config import ATTACK_COL, DATASETS, FEATURES, LABEL_COL, MAX_LEAVES, N_ESTIMATORS, SELECTED_FEATURES
 from dataset import load_dataset
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -104,19 +107,30 @@ def _evaluate_one(
 # Main evaluation loop
 # ---------------------------------------------------------------------------
 
-def evaluate() -> pd.DataFrame:
+def evaluate(feature_set: str = "full") -> pd.DataFrame:
     """Evaluate every trained model and return a tidy results DataFrame.
+
+    Parameters
+    ----------
+    feature_set:
+        ``"full"``     – evaluate models trained on all config.FEATURES.
+        ``"selected"`` – evaluate models trained on the per-dataset top-8
+                         features from config.SELECTED_FEATURES.
 
     Columns
     -------
     dataset, mode, num_leaves, n_estimators, precision, recall, f1_score
     """
+    if feature_set not in ("full", "selected"):
+        raise ValueError(f"feature_set must be 'full' or 'selected', got {feature_set!r}")
+
     rows: list[dict] = []
 
     for dataset_path in DATASETS:
         dataset_name = Path(dataset_path).stem  # e.g. "NF-BoT-IoT-v2"
         print(f"\n{'=' * 60}")
-        print(f"Dataset : {dataset_name}")
+        print(f"Dataset     : {dataset_name}")
+        print(f"Feature set : {feature_set}")
         print(f"{'=' * 60}")
 
         for integer_only in (False, True):
@@ -131,10 +145,14 @@ def evaluate() -> pd.DataFrame:
             print(f"\n  [mode={mode}] Loading test split …")
             df = load_dataset(test_path, integer_only=integer_only)
 
-            feature_cols = [c for c in FEATURES if c in df.columns]
+            if feature_set == "selected":
+                sel = SELECTED_FEATURES.get(dataset_name, {}).get(mode, FEATURES)
+                feature_cols = [c for c in sel if c in df.columns]
+            else:
+                feature_cols = [c for c in FEATURES if c in df.columns]
             X_test = df[feature_cols].values
             y_test  = df[LABEL_COL].values
-            print(f"  [mode={mode}] Test samples : {len(X_test):>10,}")
+            print(f"  [mode={mode}] Test samples : {len(X_test):>10,}  Features: {len(feature_cols)}")
 
             # Split by class for balanced sampling.
             mask0 = (y_test == 0)
@@ -151,6 +169,7 @@ def evaluate() -> pd.DataFrame:
                     model_path = (
                         MODELS_DIR
                         / dataset_name
+                        / feature_set
                         / mode
                         / str(num_leaves)
                         / str(n_estimators)
@@ -200,7 +219,7 @@ def save_csv(df: pd.DataFrame, path: Path) -> None:
     print(f"\nCSV  saved → {path.relative_to(REPO_ROOT)}")
 
 
-def save_markdown(df: pd.DataFrame, path: Path) -> None:
+def save_markdown(df: pd.DataFrame, path: Path, feature_set: str = "full") -> None:
     """Write a Markdown comparison report to *path*.
 
     One section (H2) per dataset; within each section one table per feature
@@ -214,6 +233,7 @@ def save_markdown(df: pd.DataFrame, path: Path) -> None:
         "Metrics are **weighted** averages of per-class precision, recall and F1-score"
         " on the held-out 30 % test split.\n"
     )
+    lines.append(f"Feature set: `{feature_set}`\n")
     lines.append(f"Average strategy: `{_AVG}`\n")
 
     for dataset_name in df["dataset"].unique():
@@ -286,20 +306,38 @@ def save_markdown(df: pd.DataFrame, path: Path) -> None:
 # Entry point
 # ---------------------------------------------------------------------------
 
-def test() -> None:
+def test(feature_set: str = "full") -> None:
     """Run the full evaluation pipeline and write both output files."""
-    results = evaluate()
+    results = evaluate(feature_set=feature_set)
 
     if results.empty:
         print("\nNo results collected – make sure models have been trained first.")
         return
 
-    save_csv(results,      REPORTS_DIR / "metrics.csv")
-    save_markdown(results, REPORTS_DIR / "metrics.md")
+    save_csv(results,      REPORTS_DIR / f"metrics_{feature_set}.csv")
+    save_markdown(results, REPORTS_DIR / f"metrics_{feature_set}.md", feature_set=feature_set)
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Evaluate trained LightGBM NIDS models."
+    )
+    parser.add_argument(
+        "--features",
+        choices=["full", "selected"],
+        default="full",
+        help=(
+            "Feature set to evaluate: 'full' evaluates models trained on all "
+            "config.FEATURES; 'selected' evaluates models trained on the "
+            "per-dataset top-8 features from config.SELECTED_FEATURES "
+            "(default: full)."
+        ),
+    )
+    args = parser.parse_args()
+
     warnings.simplefilter(action="ignore", category=RuntimeWarning)
     warnings.filterwarnings("ignore", category=UserWarning)
 
-    test()
+    test(feature_set=args.features)
