@@ -436,3 +436,97 @@ MAX_LEAVES = [
 ]
 
 N_ESTIMATORS = [5, 9, 13]
+
+# Top-8 features per dataset and feature mode, ranked by PD-based importance
+# (Greenwell, Boehmke & McCarthy 2018).  Derived from reports/pd_importance.md.
+# Used to train / evaluate models with only the selected features per dataset.
+SELECTED_FEATURES: dict[str, dict[str, list[str]]] = {
+    "NF-BoT-IoT-v2": {
+        "float": [
+            "MIN_TTL",
+            "MIN_IP_PKT_LEN",
+            "IN_BYTES",
+            "DST_TO_SRC_SECOND_BYTES",
+            "DST_TO_SRC_AVG_THROUGHPUT",
+            "SRC_TO_DST_SECOND_BYTES",
+            "SHORTEST_FLOW_PKT",
+            "DNS_QUERY_ID",
+        ],
+        "integer": [
+            "MIN_IP_PKT_LEN",
+            "MIN_TTL",
+            "DST_TO_SRC_SECOND_BYTES",
+            "DNS_QUERY_ID",
+            "NUM_PKTS_256_TO_512_BYTES",
+            "IN_BYTES",
+            "RETRANSMITTED_OUT_BYTES",
+            "OUT_BYTES",
+        ],
+    },
+    "NF-CSE-CIC-IDS2018-v2": {
+        "float": [
+            "MAX_TTL",
+            "L4_DST_PORT",
+            "RETRANSMITTED_IN_BYTES",
+            "L4_SRC_PORT",
+            "LONGEST_FLOW_PKT",
+            "DURATION_IN",
+            "L7_PROTO",
+            "TCP_WIN_MAX_IN",
+        ],
+        "integer": [
+            "L4_DST_PORT",
+            "MAX_TTL",
+            "RETRANSMITTED_IN_BYTES",
+            "L4_SRC_PORT",
+            "DURATION_IN",
+            "LONGEST_FLOW_PKT",
+            "MIN_TTL",
+            "TCP_FLAGS",
+        ],
+    },
+    "NF-ToN-IoT-v2": {
+        "float": [
+            "SRC_TO_DST_SECOND_BYTES",
+            "DNS_TTL_ANSWER",
+            "L7_PROTO",
+            "FLOW_DURATION_MILLISECONDS",
+            "TCP_WIN_MAX_IN",
+            "DNS_QUERY_TYPE",
+            "L4_SRC_PORT",
+            "NUM_PKTS_UP_TO_128_BYTES",
+        ],
+        "integer": [
+            "DNS_QUERY_TYPE",
+            "DNS_TTL_ANSWER",
+            "FLOW_DURATION_MILLISECONDS",
+            "TCP_WIN_MAX_IN",
+            "SRC_TO_DST_SECOND_BYTES",
+            "LONGEST_FLOW_PKT",
+            "L4_SRC_PORT",
+            "TCP_WIN_MAX_OUT",
+        ],
+    },
+    "NF-UNSW-NB15-v2": {
+        "float": [
+            "MIN_TTL",
+            "TCP_WIN_MAX_IN",
+            "LONGEST_FLOW_PKT",
+            "ICMP_TYPE",
+            "SRC_TO_DST_SECOND_BYTES",
+            "FLOW_DURATION_MILLISECONDS",
+            "DST_TO_SRC_SECOND_BYTES",
+            "SERVER_TCP_FLAGS",
+        ],
+        "integer": [
+            "MIN_TTL",
+            "TCP_WIN_MAX_IN",
+            "LONGEST_FLOW_PKT",
+            "SRC_TO_DST_SECOND_BYTES",
+            "ICMP_TYPE",
+            "FLOW_DURATION_MILLISECONDS",
+            "L4_DST_PORT",
+            "SERVER_TCP_FLAGS",
+        ],
+    },
+}
