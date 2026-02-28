@@ -28,7 +28,7 @@ from sklearn.metrics import f1_score, precision_score, recall_score
 # Allow running directly from src/.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from config import ATTACK_COL, DATASETS, LABEL_COL, MAX_LEAVES, N_ESTIMATORS
+from config import ATTACK_COL, DATASETS, FEATURES, LABEL_COL, MAX_LEAVES, N_ESTIMATORS
 from dataset import load_dataset
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -131,7 +131,7 @@ def evaluate() -> pd.DataFrame:
             print(f"\n  [mode={mode}] Loading test split …")
             df = load_dataset(test_path, integer_only=integer_only)
 
-            feature_cols = [c for c in df.columns if c not in (LABEL_COL, ATTACK_COL)]
+            feature_cols = [c for c in FEATURES if c in df.columns]
             X_test = df[feature_cols].values
             y_test  = df[LABEL_COL].values
             print(f"  [mode={mode}] Test samples : {len(X_test):>10,}")

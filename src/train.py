@@ -30,7 +30,7 @@ from joblib import Parallel, delayed
 # Allow running directly from the src/ directory.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from config import ATTACK_COL, DATASETS, LABEL_COL, MAX_LEAVES, N_ESTIMATORS
+from config import ATTACK_COL, DATASETS, FEATURES, LABEL_COL, MAX_LEAVES, N_ESTIMATORS
 from dataset import load_dataset
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -99,7 +99,7 @@ def train() -> None:
 
             df = load_dataset(train_path, integer_only=integer_only)
 
-            feature_cols = [c for c in df.columns if c not in (LABEL_COL, ATTACK_COL)]
+            feature_cols = [c for c in FEATURES if c in df.columns]
             X_train = df[feature_cols].values
             y_train = df[LABEL_COL].values
 

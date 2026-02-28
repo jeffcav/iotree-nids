@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from config import FEATURES, FLOAT_FEATURES, LABEL_COL, ATTACK_COL, DATASETS, L7_PROTO_MAP, L7_PROTO_UNKNOWN
+from config import FEATURES, LABEL_COL, ATTACK_COL, DATASETS, L7_PROTO_MAP, L7_PROTO_UNKNOWN
 
 _UINT16_MAX = np.iinfo(np.uint16).max  # 65535
 _FLOAT32_MAX = np.finfo(np.float32).max  # ~3.4e+38
@@ -66,14 +66,12 @@ def load_dataset(path: str, integer_only: bool = False) -> pd.DataFrame:
     pd.DataFrame
         DataFrame with columns = FEATURES + [LABEL_COL, ATTACK_COL].
     """
-    feature_cols = [f for f in FEATURES if not (integer_only and f in FLOAT_FEATURES)]
-    usecols = feature_cols + [LABEL_COL, ATTACK_COL]
+    usecols = list(FEATURES) + [LABEL_COL, ATTACK_COL]
     df = pd.read_csv(path, usecols=usecols)
     # Enforce feature column order: features first, then labels
     df = df[usecols]
 
     if integer_only:
-        df = df.drop(columns=FLOAT_FEATURES, errors="ignore")
         # Map L7_PROTO float values to categorical uint16 IDs before saturation.
         # Unknown values (not in the map) are assigned L7_PROTO_UNKNOWN.
         df["L7_PROTO"] = (

@@ -46,13 +46,6 @@ FEATURES = [
     "FTP_COMMAND_RET_CODE",
 ]
 
-# Features that are inherently floating-point and cannot be meaningfully
-# represented as uint16. They are excluded when integer_only=True.
-FLOAT_FEATURES = [
-    "SRC_TO_DST_SECOND_BYTES",
-    "DST_TO_SRC_SECOND_BYTES",
-]
-
 LABEL_COL = "Label"
 ATTACK_COL = "Attack"
 
